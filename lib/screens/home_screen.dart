@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:api_using_dio/models/signup_request_model.dart';
 import 'package:api_using_dio/screens/login_screen.dart';
 import 'package:api_using_dio/services/get_api_service.dart';
@@ -7,6 +9,8 @@ import 'package:api_using_dio/widgets/radio_field.dart';
 import 'package:api_using_dio/widgets/text_form_field.dart';
 import 'package:flutter/material.dart';
 
+import '../models/signup_response_model.dart';
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -15,11 +19,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return buildBody();
-  }
-
   GlobalKey<FormState> _registerKey = GlobalKey<FormState>();
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -28,9 +27,13 @@ class _MyWidgetState extends State<MyHomePage> {
   String gender = "male";
   String status = "active";
 
+  @override
+  Widget build(BuildContext context) {
+    return buildBody();
+  }
+
   Widget buildBody() {
     return Scaffold(
-
       appBar: AppBar(
         backgroundColor: Colors.greenAccent,
         centerTitle: true,
@@ -153,24 +156,34 @@ class _MyWidgetState extends State<MyHomePage> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_registerKey.currentState!.validate()) {
+                        final snackBar =
+                            SnackBar(content: const Text('User Registered!'));
                         SignUpRequestModel signUpRequestModel =
                             SignUpRequestModel(
                                 name: nameController.text,
                                 email: emailController.text,
                                 gender: gender,
                                 status: status);
-                        PostApiService.postData(signUpRequestModel);
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LoginScreen(),
-                            ));
+                        bool isSuccess =
+                            await PostApiService.postData(signUpRequestModel);
+                        if (isSuccess) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ));
+                        } else {
+                          final snackBar = SnackBar(
+                              content: const Text('User Not Registered!'));
+                        }
+
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                     },
                     child: const Text("SignUp",
-                        style: TextStyle(color: Colors.black,fontSize: 18)),
+                        style: TextStyle(color: Colors.black, fontSize: 18)),
                   ),
                 ),
               ],

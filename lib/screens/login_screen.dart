@@ -1,6 +1,7 @@
-import 'dart:math';
+import 'dart:developer';
 
 import 'package:api_using_dio/models/signup_response_model.dart';
+import 'package:api_using_dio/screens/home_screen.dart';
 import 'package:api_using_dio/services/get_api_service.dart';
 import 'package:api_using_dio/utils/signup_verification.dart';
 import 'package:api_using_dio/widgets/text_form_field.dart';
@@ -18,6 +19,22 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  List<SignUpResponseModel> userData = [];
+
+  init() async {
+    await GetApiService.getData().then((value) {
+      userData = value;
+      setState(() {
+        
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +74,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(10)),
                     ),
                     onPressed: () {
-                      GetApiService.getData(id:"5971275");
+                      log(">>>>>>>>>>>>>>>>>>>>>>>>$userData");
+                      // GetApiService.getData(id: "5971275");
+                      
                       // (GetApiService.getEmail() == emailController.text)
                       //     ? log(0000000000)
                       //     : log(92423222);
@@ -74,33 +93,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
-
-// FutureBuilder<SignUpResponseModel?>(
-//           future: _client.getUser(id: '1'),
-//           builder: (context, snapshot) {
-//             if (snapshot.hasData) {
-//               User? userInfo = snapshot.data;
-//               if (userInfo != null) {
-//                 Data userData = userInfo.data;
-//                 return Column(
-//                   mainAxisSize: MainAxisSize.min,
-//                   children: [
-//                     Image.network(userData.avatar),
-//                     SizedBox(height: 8.0),
-//                     Text(
-//                       '${userInfo.data.firstName} ${userInfo.data.lastName}',
-//                       style: TextStyle(fontSize: 16.0),
-//                     ),
-//                     Text(
-//                       userData.email,
-//                       style: TextStyle(fontSize: 16.0),
-//                     ),
-//                   ],
-//                 );
-//               }
-//             }
-//             return CircularProgressIndicator();
-//           },
-//         ),
-//       ),
